@@ -9,6 +9,7 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow;
+
 const winURL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:9080'
   : `file://${__dirname}/index.html`;
@@ -18,9 +19,11 @@ function createWindow() {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 563,
+    width: 800,
+    height: 715,
+    minWidth: 800,
+    minHeight: 715,
     useContentSize: true,
-    width: 1000,
   });
 
   mainWindow.loadURL(winURL);
