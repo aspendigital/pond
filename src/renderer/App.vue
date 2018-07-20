@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="app-container">
     <router-view></router-view>
   </div>
 </template>
@@ -10,6 +10,6 @@
   };
 </script>
 
-<style>
-  /* CSS */
+<style lang="less">
+ @import './less/theme';
 </style>
