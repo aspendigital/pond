@@ -65,33 +65,35 @@
 </template>
 
 <script>
-  import ErrorBag from '../../validation/error-bag';
-  import validationHelpers from '../../validation/helpers';
-  import PortFinder from '../../environments/port-finder';
-  import InitializerFactory from '../../environments/initializer-factory';
-  import Vue from 'vue';
+  import { mapGetters } from 'vuex';
+  import ErrorBag from '../../utils/validation/error-bag';
+  import validationHelpers from '../../utils/validation/helpers';
+  import PortFinder from '../../utils/environments/port-finder';
+  import InitializerFactory from '../../utils/environments/initializer-factory';
 
   export default {
     data() {
       return {
         errorBag: new ErrorBag(),
         waiting: false,
+        project: {},
       };
     },
     computed: {
-      project() {
-        return this.$store.state.projects.newProject;
-      },
+      ...mapGetters([
+        'projects',
+        'newProject',
+      ]),
     },
     methods: {
       validateAndGoToNext() {
         const initializer = InitializerFactory.createInitializer(this.project);
 
-        initializer.validateProvisionerConfiguration(this.errorBag,
-          this.$store.state.projects.list)
+        initializer.validateProvisionerConfiguration(this.errorBag, this.projects)
           .then(() => {
             this.waiting = false;
             if (!this.errorBag.hasErrors()) {
+              this.$store.commit('UPDATE_NEW_PROJECT', this.project);
               this.$emit('show-provisioning-step');
             } else {
               validationHelpers.focusFirstField(this.errorBag);
@@ -110,17 +112,25 @@
         setTimeout(() => this.validateAndGoToNext(), 500);
       },
       goPrevStep() {
+        this.$store.commit('UPDATE_NEW_PROJECT', this.project);
         this.$emit('show-general-step');
       },
     },
     mounted() {
       this.errorBag.cleanup();
 
+      this.project = _.cloneDeep(this.newProject);
+
       if (!this.project.localPort) {
-        this.project.localPort = PortFinder.getNextPort(this.$store.state.projects.list);
+        this.project.localPort = PortFinder.getNextPort(this.projects);
       }
 
-      Vue.nextTick(_ => this.$refs.localPortInput.focus());
+      this.$nextTick(_ => this.$refs.localPortInput.focus());
+    },
+    watch: {
+      newProject(val) {
+        this.project = _.cloneDeep(val);
+      }
     },
   };
 </script>

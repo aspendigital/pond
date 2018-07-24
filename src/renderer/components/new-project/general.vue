@@ -222,13 +222,13 @@
 </template>
 
 <script>
-  import ErrorBag from '../../validation/error-bag';
-  import validationHelpers from '../../validation/helpers';
-  import PreValidator from '../../environments/project-prevalidator';
+  import { mapGetters } from 'vuex';
+  import ErrorBag from '../../utils/validation/error-bag';
+  import validationHelpers from '../../utils/validation/helpers';
+  import PreValidator from '../../utils/environments/project-prevalidator';
   import DirectoryLocation from '../directory-location.vue';
-  import platforms from '../../environments/platforms';
-  import config from '../../config';
-  import Vue from 'vue';
+  import platforms from '../../utils/environments/platforms';
+  import config from '../../utils/config';
 
   export default {
     data() {
@@ -239,12 +239,13 @@
         // because we want to focus the admin first
         // name input when Use Advanced options is clicked.
         useAdvancedOptions: false,
+        project: {},
       };
     },
     computed: {
-      project() {
-        return this.$store.state.projects.newProject;
-      },
+      ...mapGetters([
+        'newProject'
+      ]),
       phpVersion() {
         const platform = platforms.getPlatform();
         const info = config.builtInServerInfo[platform];
@@ -261,6 +262,7 @@
         validator.validate(this.project, this.errorBag);
 
         if (!this.errorBag.hasErrors()) {
+          this.$store.commit('UPDATE_NEW_PROJECT', this.project);
           this.$emit('show-env-config-step');
         } else {
           validationHelpers.focusFirstField(this.errorBag);
@@ -282,18 +284,24 @@
         this.project.useAdvancedOptions = this.useAdvancedOptions;
 
         if (this.useAdvancedOptions) {
-          Vue.nextTick(() => this.$refs.adminFirstNameInput.focus());
+          this.$nextTick(() => this.$refs.adminFirstNameInput.focus());
         }
       },
     },
     mounted() {
       this.errorBag.cleanup();
+      this.project = _.cloneDeep(this.newProject);
       this.useAdvancedOptions = this.project.useAdvancedOptions;
       this.$refs.useAdvancedOptions.checked = this.useAdvancedOptions;
 
-      Vue.nextTick(() => this.$refs.nameInput.focus());
+      this.$nextTick(() => this.$refs.nameInput.focus());
 
       $(document).on('click');
     },
+    watch: {
+      newProject(val) {
+        this.project = _.cloneDeep(val);
+      }
+    }
   };
 </script>

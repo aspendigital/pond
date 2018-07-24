@@ -1,4 +1,6 @@
-import { app, BrowserWindow } from 'electron' // eslint-disable-line
+import { app, ipcMain, BrowserWindow } from 'electron'; // eslint-disable-line
+import storage from 'electron-json-storage';
+import ProjectDb from './lib/projects-db';
 
 /**
  * Set `__static` path to static files in production
@@ -9,6 +11,15 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow;
+let projectDb = new ProjectDb(storage);
+
+projectDb.init()
+  .then(() => {
+    registerIpcListeners();
+  })
+  .catch((error) => {
+    console.log('Error initializing JSON storage:', error);
+  });
 
 const winURL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:9080'
@@ -47,6 +58,18 @@ app.on('activate', () => {
   }
 });
 
+function registerIpcListeners()
+{
+  ipcMain.on('create-project', (event, payload) => {
+    projectDb.create(payload)
+      .then((data) => {
+        event.sender.send('project-created', data);
+      })
+      .catch((error) => {
+        console.log('Error creating project:', error);
+      })
+  });
+}
 /**
  * Auto Updater
  *

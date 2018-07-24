@@ -2,6 +2,7 @@ import Vue from 'vue';
 import axios from 'axios';
 import VueI18n from 'vue-i18n';
 import $ from 'jquery';
+import _ from 'lodash';
 
 import App from './App';
 import router from './router';
@@ -9,6 +10,7 @@ import store from './store';
 import messages from './i18n/messages';
 
 window.$ = $;
+window._ = _;
 
 Vue.use(VueI18n);
 const i18n = new VueI18n({

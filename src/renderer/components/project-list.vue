@@ -13,7 +13,7 @@
               @click="setSelectedProject(project)"
               v-bind:class="{ selected: selectedProject === project }"
           >
-            <span class="status-indicator starred" v-bind:class="{ online: project.runtime.status == 'online' }"></span>
+            <span class="status-indicator starred" v-bind:class="{ online: project.runtime.status === 'online' }"></span>
             <h3>{{ project.name }}</h3>
           </li>
         </ul>
@@ -29,7 +29,7 @@
                   @click="setSelectedProject(project)"
                   v-bind:class="{ selected: selectedProject === project }"
               >
-                <span class="status-indicator" v-bind:class="{ online: project.runtime.status == 'online' }"></span>
+                <span class="status-indicator" v-bind:class="{ online: project.runtime.status === 'online' }"></span>
                 <h3>{{ project.name }}</h3>
               </li>
             </ul>

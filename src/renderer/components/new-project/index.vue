@@ -24,6 +24,7 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex';
   import GeneralInformation from './general.vue';
   import PondConfiguration from './pond-configuration.vue';
   import Provisioning from './provisioning.vue';
@@ -33,12 +34,14 @@
     data() {
       return {
         stepCode: 'general',
+        project: {},
       };
     },
     computed: {
-      project() {
-        return this.$store.state.projects.newProject;
-      },
+      ...mapGetters([
+        'projects',
+        'newProject'
+      ]),
     },
     components: {
       GeneralInformation,
@@ -61,7 +64,9 @@
       },
     },
     mounted() {
-      if (!this.$store.state.projects.list.length) {
+      this.project = _.cloneDeep(this.newProject);
+
+      if (!this.projects.length) {
         this.$store.dispatch('initNewProjectState', { isDemo: true });
       } else {
         this.$store.dispatch('initNewProjectState');

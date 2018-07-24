@@ -11,6 +11,11 @@ export default new Router({
       component: require('@/components/projects-view').default,
     },
     {
+      path: '/new-project',
+      name: 'new-project',
+      component: require('@/components/new-project/index').default
+    },
+    {
       path: '*',
       redirect: '/',
     },
